@@ -1090,6 +1090,25 @@ module.exports = {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1099,13 +1118,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const semver = __importStar(__webpack_require__(876));
@@ -1114,7 +1126,8 @@ function run() {
         try {
             const currentVersion = core.getInput('current_version');
             const bumpLevel = core.getInput('level');
-            const newVersion = yield bumpSemver(currentVersion, bumpLevel);
+            const preId = core.getInput('preid');
+            const newVersion = yield bumpSemver(currentVersion, bumpLevel, preId);
             core.setOutput('new_version', newVersion);
         }
         catch (e) {
@@ -1123,7 +1136,7 @@ function run() {
         }
     });
 }
-function bumpSemver(currentVersion, bumpLevel) {
+function bumpSemver(currentVersion, bumpLevel, preId) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!semver.valid(currentVersion)) {
             throw new Error(`${currentVersion} is not a valid semver`);
@@ -1134,7 +1147,7 @@ function bumpSemver(currentVersion, bumpLevel) {
         // https://semver.org/#is-v123-a-semantic-version
         // If the current version has 'v' prefix (e.g., v1.2.3), keep the prefix in the new version too.
         const hasVPrefix = currentVersion.startsWith('v');
-        const bumpedVersion = semver.inc(currentVersion, bumpLevel);
+        const bumpedVersion = semver.inc(currentVersion, bumpLevel, preId);
         let newVersion = bumpedVersion;
         if (hasVPrefix) {
             newVersion = `v${newVersion}`;
